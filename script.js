@@ -212,6 +212,24 @@ const I18N = {
 };
 
 /* ================================================================
+   SVG FALLBACK IMAGE
+   Shows a themed placeholder if an Unsplash photo fails to load
+   ================================================================ */
+const FALLBACK_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'>" +
+    "<rect width='600' height='400' fill='#0b1a2b'/>" +
+    "<g fill='none' stroke='#3d6a9c' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'>" +
+      "<path d='M120 250 L170 180 L430 180 L480 250 L480 285 L120 285 Z'/>" +
+      "<circle cx='205' cy='285' r='30'/>" +
+      "<circle cx='395' cy='285' r='30'/>" +
+      "<line x1='170' y1='230' x2='430' y2='230'/>" +
+    "</g>" +
+    "<text x='300' y='355' fill='#5c8fc7' font-family='system-ui,sans-serif' " +
+      "font-size='20' letter-spacing='2' text-anchor='middle'>EIROSERVISS TDI</text>" +
+  "</svg>"
+);
+
+/* ================================================================
    2. SITE CONFIG
    ================================================================ */
 const SITE = {
@@ -226,6 +244,20 @@ const SITE = {
     {init:'A', name:'Andris B.', city:'Rīga',    stars:5},
     {init:'M', name:'Marika K.', city:'Jūrmala', stars:5},
     {init:'J', name:'Jānis P.',  city:'Rīga',    stars:4}
+  ],
+
+  /* ---- GALLERY IMAGES (matched by index with I18N[lang].gallery) ---- */
+  galleryImages:[
+    /* 0. Diagnostics center / Диагностический центр — механик с диагностикой */
+    'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&h=600&q=80',
+    /* 1. Engine repair / Ремонт двигателя — работа с двигателем */
+    'https://images.unsplash.com/photo-1625047509168-a7026f36de04?auto=format&fit=crop&w=900&h=600&q=80',
+    /* 2. Brake service / Тормозной сервис — тормозной диск / суппорт */
+    'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=900&h=600&q=80',
+    /* 3. Tire fitting / Шиномонтаж — колесо / шина */
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=900&h=600&q=80',
+    /* 4. Car wash / Мойка авто — мойка автомобиля */
+    'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=900&h=600&q=80'
   ]
 };
 
@@ -391,13 +423,18 @@ function render(){
     `<option>${sv.name}</option>`
   ).join('');
 
-  /* Gallery */
-  document.getElementById('galleryTrack').innerHTML = L.gallery.map((g,i)=>
-    `<div class="gallery-item">
-      <img src="https://picsum.photos/seed/${SITE.id}-gal-${i}/600/400" alt="${g}" loading="lazy" draggable="false">
+  /* Gallery — themed Unsplash photos + SVG fallback */
+  document.getElementById('galleryTrack').innerHTML = L.gallery.map((g,i)=>{
+    const src = (SITE.galleryImages && SITE.galleryImages[i]) || FALLBACK_IMG;
+    return `<div class="gallery-item">
+      <img src="${src}"
+           alt="${g}"
+           loading="lazy"
+           draggable="false"
+           onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
       <span>${g}</span>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 
   /* Active language button */
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===currentLang));
